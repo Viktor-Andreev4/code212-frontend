@@ -16,12 +16,14 @@ import {
   useColorModeValue,
   Stack,
   Image,
-  Text
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
+import ExamCard from './components/exam/ExamCard';
+import ExamDrawer from './components/exam/ExamUploadDrawer';
+import ProblemDrawer from './components/Problem/ProblemUploadDrawer';
 import {useAuth} from '../src/components/context/AuthContext';
 
-const Links = ['Home', 'Exams'];
+const Links = ['Exam'];
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -67,14 +69,17 @@ export default function withAction() {
             </HStack>
           </HStack>
           <Flex alignItems={'center'}>
-            <Button
+          <ExamDrawer onOpen={onOpen} onClose={onClose} isOpen={isOpen}/>
+          <ProblemDrawer onOpen={onOpen} onClose={onClose} isOpen={isOpen}/>
+          {/* <Button
               variant={'solid'}
               colorScheme={'teal'}
               size={'sm'}
               mr={4}
-              leftIcon={<AddIcon />}>
+              leftIcon={<AddIcon />}
+              onClick={onOpen}>
               Upload Exam
-            </Button>
+            </Button> */}
             
             <Menu>
               <MenuButton
@@ -111,7 +116,9 @@ export default function withAction() {
         ) : null}
       </Box>
 
-      <Box p={4}><Text></Text></Box>
+      <Box p={4}>
+        <ExamCard/>
+      </Box>
     </>
   );
 }

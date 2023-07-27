@@ -70,6 +70,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
             })
         })
     }
+
+    
+
     const logout = () => {
         localStorage.removeItem("jwtToken");
         setUser(null);
@@ -109,4 +112,6 @@ export const useAuth = () => {
     }
     return context;
 }
+
+
 export default AuthProvider;

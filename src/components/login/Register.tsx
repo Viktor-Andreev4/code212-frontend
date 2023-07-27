@@ -1,4 +1,6 @@
 import {
+    Alert,
+    AlertIcon,
     Flex,
     Box,
     FormControl,
@@ -15,9 +17,39 @@ import {
     Link,
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import { Formik, Form, useField } from "formik";
+import * as Yup from 'yup';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 
+interface MyTextInputProps {
+    label: string;
+    name: string;
+    type: string;
+    id?: string;
+    placeholder?: string;
+}
+
+const MyTextInput = ({label, ...props} : MyTextInputProps) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={2}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const SignupForm = () => {
+    const navigate = useNavigate();
+    
+}
 
 export default function SignupCard() {
     const [showPassword, setShowPassword] = useState(false);
