@@ -14,7 +14,7 @@ import {
   Textarea
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import MyDropzone from '../Dropzome';
+import MultipleFileUploadField from '../MultipleFileUploadField';
 // import BasicDateTimePicker from '../Date/DatePicker';
 
 interface ProblemDrawerProps {
@@ -62,9 +62,9 @@ function ProblemDrawer({ isOpen, onClose, onOpen }: ProblemDrawerProps) {
                 <Textarea placeholder="Enter some text" />
               </Box>
                <FormLabel htmlFor='Input files'>Drop input .txt files here</FormLabel>
-                <MyDropzone/>
+                <MultipleFileUploadField/>
                 <FormLabel htmlFor='Output files'>Drop output .txt files here</FormLabel>
-                <MyDropzone/>
+                <MultipleFileUploadField/>
             </Stack>
           </DrawerBody>
 

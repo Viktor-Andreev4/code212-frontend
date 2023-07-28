@@ -33,21 +33,22 @@ const files: Files = {
         name: "Main.java",
         language: "java",
         value: `package org.example;
-        public class HelloWorld {
-            public static void main(String[] args) {
-                System.out.println("Hello, World");
-            }
-        }
-        `
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World");
+    }
+}
+    `
     },
     "script.js": {
         name: "script.js",
-        language: "javascrip",
+        language: "javascript",
         value: `console.log("Hello, World")
           `
     }
 }
 function ProblemPage() {
+    const [language, setLanguage] = useState("JavaScript");
     const [fileName, setFileName] = useState("Main.java");
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
     const file = files[fileName];
@@ -57,7 +58,10 @@ function ProblemPage() {
         difficulty: 'Easy',
     };
 
-
+    const switchLanguage = (lang: string, fileName: string) => {
+        setLanguage(lang);
+        setFileName(fileName);
+      }
     function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor, _monaco: typeof monaco) {
         editorRef.current = editor as monaco.editor.IStandaloneCodeEditor;
     }

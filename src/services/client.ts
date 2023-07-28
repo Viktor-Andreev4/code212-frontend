@@ -34,3 +34,12 @@ export const login = async (username:string, password:string) => {
         throw error;
     }
 }
+
+export const getProblems = async () => {  
+    try {
+        return await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/problems`,
+        getAuthConfig());
+    } catch (error) {
+        throw error;
+    }
+}
