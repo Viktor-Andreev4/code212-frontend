@@ -35,13 +35,14 @@ interface Problem {
 function ExamDrawer({ isOpen, onClose, onOpen }: ExamDrawerProps) {
 
   const firstField = useRef(null);
-  const [problems, setProblems] = useState<Problem[]>([]); // provide type to the state
+  const [availableProblems, setAvailableProblems] = useState<Problem[]>([]);
+  const [selectedProblems, setSelectedProblems] = useState<Problem[]>([]);
 
   useEffect(() => {
     async function fetchProblems() {
       try {
         const result = await getProblems();
-        setProblems(result.data);
+        setAvailableProblems(result.data);
       } catch (error) {
         console.error("Error while fetching problems", error);
       }
@@ -50,7 +51,18 @@ function ExamDrawer({ isOpen, onClose, onOpen }: ExamDrawerProps) {
     if(isOpen) { // Fetch problems when the drawer opens
       fetchProblems();
     }
-  }, [isOpen]);
+  }, [isOpen]); // re-run the effect when `isOpen` changes
+
+  const handleProblemSelection = (e: any) => {
+    const selectedProblemId = e.target.value;
+    const selectedProblem = availableProblems.find(problem => problem.id.toString() === selectedProblemId);
+    const remainingProblems = availableProblems.filter(problem => problem.id.toString() !== selectedProblemId);
+  
+    if (selectedProblem) { // Check if selectedProblem is not undefined
+      setSelectedProblems([...selectedProblems, selectedProblem]);
+      setAvailableProblems(remainingProblems);
+    }
+  }
 
   return (
     <>
@@ -73,21 +85,22 @@ function ExamDrawer({ isOpen, onClose, onOpen }: ExamDrawerProps) {
 
           <DrawerBody>
         <Stack spacing='24px'>
-        <Box>
-                <FormLabel htmlFor='examname'>Exam name</FormLabel>
-                <Input
-                  ref={firstField}
-                  id='examname'
-                  placeholder='Please enter name for the exam'
-                />
-              </Box>
+          {/* ... */}
           <Box>
             <FormLabel htmlFor='owner'>Select Problems</FormLabel>
-            <Select id='owner'>
-              {problems.map((problem) => (
+            <Select id='owner' onChange={handleProblemSelection}>
+              <option value="">Please select a problem</option>
+              {availableProblems.map((problem) => (
                 <option key={problem.id} value={problem.id}>{problem.title}</option>
               ))}
             </Select>
+          </Box>
+
+          <Box>
+            <h4>Selected Problems</h4>
+            {selectedProblems.map(problem => (
+              <div key={problem.id}>{problem.title}</div>
+            ))}
           </Box>
         </Stack>
       </DrawerBody>
