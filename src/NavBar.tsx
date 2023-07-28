@@ -3,6 +3,7 @@ import {
   Box,
   Flex,
   Avatar,
+  Center,
   HStack,
   Link,
   IconButton,
@@ -20,10 +21,10 @@ import {
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import ExamCard from './components/exam/ExamCard';
 import ExamDrawer from './components/exam/ExamUploadDrawer';
-import ProblemDrawer from './components/Problem/ProblemUploadDrawer';
-import {useAuth} from '../src/components/context/AuthContext';
+import ProblemDrawer from './components/problem/ProblemUploadDrawer';
+import { useAuth } from '../src/components/context/AuthContext';
 
-const Links = ['Exam'];
+const Links = ['Exam', 'Participants'];
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -41,6 +42,8 @@ const NavLink = ({ children }: { children: ReactNode }) => (
 
 export default function withAction() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const examDisclosure = useDisclosure();
+  const problemDisclosure = useDisclosure();
   const { logout, user } = useAuth();
   return (
     <>
@@ -54,7 +57,7 @@ export default function withAction() {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
-            <Image 
+            <Image
               borderRadius='full'
               boxSize='35px'
               src="https://play-lh.googleusercontent.com/fHfTlNIq5PMps_296XPMC2N-u5ARCmaSM_lNuukKjhK8ITbHHS5YyYyT5ABJU1s8_Q=w240-h480"
@@ -69,9 +72,17 @@ export default function withAction() {
             </HStack>
           </HStack>
           <Flex alignItems={'center'}>
-          <ExamDrawer onOpen={onOpen} onClose={onClose} isOpen={isOpen}/>
-          <ProblemDrawer onOpen={onOpen} onClose={onClose} isOpen={isOpen}/>
-          {/* <Button
+            <ExamDrawer
+              onOpen={examDisclosure.onOpen}
+              onClose={examDisclosure.onClose}
+              isOpen={examDisclosure.isOpen}
+            />
+            <ProblemDrawer
+              onOpen={problemDisclosure.onOpen}
+              onClose={problemDisclosure.onClose}
+              isOpen={problemDisclosure.isOpen}
+            />
+            {/* <Button
               variant={'solid'}
               colorScheme={'teal'}
               size={'sm'}
@@ -80,7 +91,7 @@ export default function withAction() {
               onClick={onOpen}>
               Upload Exam
             </Button> */}
-            
+
             <Menu>
               <MenuButton
                 as={Button}
@@ -98,7 +109,7 @@ export default function withAction() {
               <MenuList>
                 <MenuDivider />
                 <MenuItem onClick={logout}>
-                     Logout  
+                  Logout
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -115,9 +126,8 @@ export default function withAction() {
           </Box>
         ) : null}
       </Box>
-
       <Box p={4}>
-        <ExamCard/>
+        <ExamCard />
       </Box>
     </>
   );

@@ -43,17 +43,17 @@ function ExamDrawer({ isOpen, onClose, onOpen }: ExamDrawerProps) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px'>
-            Create a new account
+            Create a new exam
           </DrawerHeader>
 
           <DrawerBody>
             <Stack spacing='24px'>
               <Box>
-                <FormLabel htmlFor='username'>Problem Name</FormLabel>
+                <FormLabel htmlFor='examname'>Exam name</FormLabel>
                 <Input
                   ref={firstField}
-                  id='username'
-                  placeholder='Please enter name for the problem'
+                  id='examname'
+                  placeholder='Please enter name for the exam'
                 />
               </Box>
 

@@ -3,9 +3,7 @@ import {
   Button,
   Input,
   Stack,
-  Select,
   FormLabel,
-
   DrawerFooter,
   Drawer,
   DrawerOverlay,
@@ -14,9 +12,8 @@ import {
   DrawerHeader,
   DrawerBody,
   Textarea
-} from '@chakra-ui/react'
-import { useRef } from 'react'
-import { useDropzone } from "react-dropzone"
+} from '@chakra-ui/react';
+import { useRef } from 'react';
 import MyDropzone from '../Dropzome';
 // import BasicDateTimePicker from '../Date/DatePicker';
 
@@ -46,7 +43,7 @@ function ProblemDrawer({ isOpen, onClose, onOpen }: ProblemDrawerProps) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px'>
-            Create a new account
+            Create a new problem
           </DrawerHeader>
 
           <DrawerBody>
@@ -64,7 +61,10 @@ function ProblemDrawer({ isOpen, onClose, onOpen }: ProblemDrawerProps) {
                 <FormLabel htmlFor='description'>Problem description</FormLabel>
                 <Textarea placeholder="Enter some text" />
               </Box>
-              <MyDropzone/>
+               <FormLabel htmlFor='Input files'>Drop input .txt files here</FormLabel>
+                <MyDropzone/>
+                <FormLabel htmlFor='Output files'>Drop output .txt files here</FormLabel>
+                <MyDropzone/>
             </Stack>
           </DrawerBody>
 

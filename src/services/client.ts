@@ -9,7 +9,8 @@ const getAuthConfig = () => ({
 
 export const getUsers = async () => {  
     try {
-        return await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/users`);
+        return await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/users`,
+        getAuthConfig());
     } catch (error) {
         throw error;
     }

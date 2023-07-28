@@ -1,4 +1,7 @@
-import { Box, Text } from '@chakra-ui/react';
+import { 
+    Box, 
+    Text
+} from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 
 function MyDropzone() {

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import Login from './components/login/Login.tsx'
 import Register from './components/login/Register.tsx'
+import CodeEditor from './components/code-editor/CodeEditor.tsx'  
 import { ChakraProvider } from '@chakra-ui/react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Register />//<AuthProvider><Register /></AuthProvider>
+  },
+  {
+    path: "/code-editor",
+    element: <CodeEditor />//<AuthProvider><Register /></AuthProvider>
   },
   {
     path: "/dashboard",

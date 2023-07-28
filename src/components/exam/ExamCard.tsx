@@ -60,14 +60,15 @@ export default function ExamProfile() {
   return (
     <Center py={6}>
       <Box
-        maxW={'320px'}
+        maxW={'540px'}
         w={'full'}
         bg={useColorModeValue('white', 'gray.900')}
         boxShadow={'2xl'}
         rounded={'lg'}
         p={6}
-        textAlign={'center'}>
-        <Heading fontSize={'2xl'} fontFamily={'body'}>
+        textAlign={'center'}
+        mt={175}>
+        <Heading fontSize={'2xl'} fontFamily={'body'} mb={5}>
           {exam?.name}
         </Heading>
         <Text fontWeight={600} color={'gray.500'} mb={4}>
