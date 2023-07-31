@@ -11,9 +11,10 @@ import {
     MenuItem
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Editor from "@monaco-editor/react";
 import * as monaco from 'monaco-editor';
+import { useLocation } from 'react-router-dom';
 
 interface Files {
     [fileName: string]: {
@@ -22,6 +23,13 @@ interface Files {
         value: string;
     }
 }
+interface Problem {
+    id: number;
+    title: string;
+    description: string;
+    input_url: string;
+    output_url: string;
+  }
 
 const files: Files = {
     "script.py": {
@@ -36,17 +44,15 @@ const files: Files = {
           `
     }
 }
-function ProblemPage() {
+function CodeEditor() {
     const [language, setLanguage] = useState("JavaScript");
     const [fileName, setFileName] = useState("script.js");
+    const location = useLocation();
+    const problem: Problem = location.state.problem;
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
     const file = files[fileName];
-    const problem = {
-        title: 'Two Sum',
-        description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.',
-        difficulty: 'Easy',
-    };
 
+    
     const switchLanguage = (lang: string, fileName: string) => {
         setLanguage(lang);
         setFileName(fileName);
@@ -100,4 +106,4 @@ function ProblemPage() {
     );
 }
 
-export default ProblemPage;
+export default CodeEditor;
