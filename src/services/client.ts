@@ -90,3 +90,25 @@ export const getUserId = async (email: string) => {
         throw error;
     }
 }
+
+export const getAllExams = async () => {
+    try {
+        return await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/exams/all`,
+            getAuthConfig()
+        );
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getExamParticipants = async (examId: number) => {
+    try {
+        return await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/exams/${examId}/participants`,
+            getAuthConfig()
+        );
+    } catch (error) {
+        throw error;
+    }
+}

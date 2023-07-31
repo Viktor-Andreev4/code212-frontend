@@ -14,7 +14,7 @@ import {
   Textarea
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import MultipleFileUploadField from '../MultipleFileUploadField';
+import MultipleFileUploadField from './MultipleFileUploadField';
 // import BasicDateTimePicker from '../Date/DatePicker';
 
 interface ProblemDrawerProps {

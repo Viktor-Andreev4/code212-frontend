@@ -4,7 +4,6 @@ import {
   Flex,
   Avatar,
   HStack,
-  Link,
   IconButton,
   Button,
   Menu,
@@ -22,11 +21,29 @@ import ExamCard from './components/exam/ExamCard';
 import ExamDrawer from './components/exam/ExamUploadDrawer';
 import ProblemDrawer from './components/problem/ProblemUploadDrawer';
 import { useAuth } from '../src/components/context/AuthContext';
+import { Link as ChakraLink } from "@chakra-ui/react";
+import { LinkProps as ChakraLinkProps } from '@chakra-ui/react';
+import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 
-const Links = ['Exam', 'Participants'];
+type ChakraRouterLinkProps = ChakraLinkProps & RouterLinkProps;
 
-const NavLink = ({ children }: { children: ReactNode }) => (
-  <Link
+const ChakraRouterLink: React.FC<ChakraRouterLinkProps> = (props) => {
+  return <ChakraLink as={RouterLink} {...props} />;
+};
+
+const Links = [
+  { name: 'Exams', path: '/exams' },
+  { name: 'Participants', path: '/participants' },
+];
+
+type NavLinkProps = {
+  to: string;
+  children: ReactNode;
+}
+
+const NavLink: React.FC<NavLinkProps> = ({ to, children }) => (
+  <ChakraRouterLink
+    to={to}
     px={2}
     py={1}
     rounded={'md'}
@@ -34,9 +51,9 @@ const NavLink = ({ children }: { children: ReactNode }) => (
       textDecoration: 'none',
       bg: useColorModeValue('gray.200', 'gray.700'),
     }}
-    href={'#'}>
+  >
     {children}
-  </Link>
+  </ChakraRouterLink>
 );
 
 export default function withAction() {
@@ -66,7 +83,9 @@ export default function withAction() {
               spacing={4}
               display={{ base: 'none', md: 'flex' }}>
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink key={link.name} to={link.path}>
+                  {link.name}
+                </NavLink>
               ))}
             </HStack>
           </HStack>
@@ -110,7 +129,9 @@ export default function withAction() {
           <Box pb={4} display={{ md: 'none' }}>
             <Stack as={'nav'} spacing={4}>
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink key={link.name} to={link.path}>
+                  {link.name}
+                </NavLink>
               ))}
             </Stack>
           </Box>

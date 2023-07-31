@@ -10,6 +10,7 @@ import './index.css'
 import AuthProvider from './components/context/AuthContext.tsx'
 import ProtectedRoute from './shared/ProtectedRoute.tsx'
 import ProblemPage from './components/problem/ProblemPage.tsx'
+import Participants from './components/participants/Participants.tsx'
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "/problems",
     element: <ProblemPage/>
+  },
+  {
+    path: "/participants",
+    element: <Participants/>
   }
 ]) 
 ReactDOM.createRoot(document.getElementById('root')!).render(
