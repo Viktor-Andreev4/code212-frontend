@@ -29,17 +29,6 @@ const files: Files = {
         language: "python",
         value: "print('Hello, World')"
     },
-    "Main.java": {
-        name: "Main.java",
-        language: "java",
-        value: `package org.example;
-public class HelloWorld {
-    public static void main(String[] args) {
-        System.out.println("Hello, World");
-    }
-}
-    `
-    },
     "script.js": {
         name: "script.js",
         language: "javascript",
@@ -49,7 +38,7 @@ public class HelloWorld {
 }
 function ProblemPage() {
     const [language, setLanguage] = useState("JavaScript");
-    const [fileName, setFileName] = useState("Main.java");
+    const [fileName, setFileName] = useState("script.js");
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
     const file = files[fileName];
     const problem = {

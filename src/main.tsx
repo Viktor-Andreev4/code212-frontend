@@ -9,6 +9,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 import AuthProvider from './components/context/AuthContext.tsx'
 import ProtectedRoute from './shared/ProtectedRoute.tsx'
+import ProblemPage from './components/problem/ProblemPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <ProtectedRoute> <App /> </ProtectedRoute>
+  },
+  {
+    path: "/problems",
+    element: <ProblemPage/>
   }
 ]) 
 ReactDOM.createRoot(document.getElementById('root')!).render(

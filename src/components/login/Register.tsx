@@ -3,12 +3,8 @@ import {
     AlertIcon,
     Flex,
     Box,
-    FormControl,
     FormLabel,
     Input,
-    InputGroup,
-    HStack,
-    InputRightElement,
     Stack,
     Button,
     Heading,
@@ -16,10 +12,10 @@ import {
     useColorModeValue,
     Link,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { register } from '../../services/client';
 import { Formik, Form, useField } from "formik";
+import { errorNotification } from '../../services/notification';
 import * as Yup from 'yup';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 
 interface MyTextInputProps {
@@ -28,6 +24,17 @@ interface MyTextInputProps {
     type: string;
     id?: string;
     placeholder?: string;
+}
+
+interface AxiosError {
+    response?: {
+      data: {
+        message: string;
+      };
+      status: number;
+      headers: unknown;
+    };
+    code?: string;
 }
 
 const MyTextInput = ({label, ...props} : MyTextInputProps) => {
@@ -48,15 +55,86 @@ const MyTextInput = ({label, ...props} : MyTextInputProps) => {
 
 const SignupForm = () => {
     const navigate = useNavigate();
-    
+    return (
+        <Formik
+            validateOnMount={true}
+            validationSchema={Yup.object({
+                firstName: Yup.string()
+                    .required('Required'),
+                lastName: Yup.string()
+                    .required('Required'),
+                email: Yup.string()
+                    .email('Must be valid email')
+                    .required('Required'),
+                password: Yup.string()
+                    .min(8, 'Must be 8 characters or more')
+                    .required('Required')
+            })}
+            initialValues={{ firstName: '', lastName: '', email: '', password: '' }}
+            onSubmit={(values, { setSubmitting }) => {  
+                    setSubmitting(true);
+
+                    register(values.firstName, values.lastName, values.email, values.password)
+                    .then((res) => {
+
+                        console.log("User registered successfully!", res);
+                        navigate("/login");
+                    })
+                    .catch((err: AxiosError) => {
+
+                        errorNotification(err.code || 'Error', err.response?.data?.message || 'An error occurred');
+                    })
+                    .finally(() => {
+                        setSubmitting(false);
+                    });
+                    
+            }}>
+        {({isValid, isSubmitting}) => (
+            <Form>
+                <Stack spacing={10}>
+                    <MyTextInput 
+                        label={"First Name"}
+                        name={"firstName"}
+                        type={"text"}
+                        placeholder={"First Name"}
+                    />
+                    <MyTextInput 
+                        label={"Last Name"}
+                        name={"lastName"}
+                        type={"text"}
+                        placeholder={"Last Name"}
+                    />
+                    <MyTextInput 
+                        label={"Email"}
+                        name={"email"}
+                        type={"email"}
+                        placeholder={"Email"}
+                    />
+                    <MyTextInput 
+                        label={"Password"}
+                        name={"password"}
+                        type={"password"}
+                        placeholder={"Password"}
+                    />
+                    <Button 
+                        backgroundColor={isValid ? "blue.400" : "gray.400"} 
+                        color={'white'}
+                        _hover={{
+                            bg: isValid ? 'blue.500' : 'gray.500',
+                        }}
+                        disabled={!isValid || isSubmitting} 
+                        type={"submit"}>
+                        Sign up
+                    </Button>
+                </Stack>
+            </Form>
+        )}
+        </Formik>
+    )
 }
 
 export default function SignupCard() {
-    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
-    const handleLoginRedirect = () => {
-        navigate('/login');
-    };
     return (
         <Flex
             minH={'100vh'}
@@ -66,6 +144,9 @@ export default function SignupCard() {
             <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
                 <Stack align={'center'}>
                     <Heading fontSize={'4xl'} textAlign={'center'} mb={15}> Sign up and challenge yourself ✌️</Heading>
+                    <Text fontSize={'lg'} color={'gray.600'}>
+                        Already a user? <Link color={'blue.400'} onClick={() => navigate("/login")}>Login</Link>
+                    </Text>
                 </Stack>
                 <Box
                     rounded={'lg'}
@@ -73,56 +154,7 @@ export default function SignupCard() {
                     boxShadow={'lg'}
                     p={8}>
                     <Stack spacing={4}>
-                        <HStack>
-                            <Box>
-                                <FormControl id="firstName" isRequired>
-                                    <FormLabel>First Name</FormLabel>
-                                    <Input type="text" />
-                                </FormControl>
-                            </Box>
-                            <Box>
-                                <FormControl id="lastName" isRequired>
-                                    <FormLabel>Last Name</FormLabel>
-                                    <Input type="text" />
-                                </FormControl>
-                            </Box>
-                        </HStack>
-                        <FormControl id="email" isRequired>
-                            <FormLabel>Email address</FormLabel>
-                            <Input type="email" />
-                        </FormControl>
-                        <FormControl id="password" isRequired>
-                            <FormLabel>Password</FormLabel>
-                            <InputGroup>
-                                <Input type={showPassword ? 'text' : 'password'} />
-                                <InputRightElement h={'full'}>
-                                    <Button
-                                        variant={'ghost'}
-                                        onClick={() =>
-                                            setShowPassword((showPassword) => !showPassword)
-                                        }>
-                                        {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                                    </Button>
-                                </InputRightElement>
-                            </InputGroup>
-                        </FormControl>
-                        <Stack spacing={10} pt={2}>
-                            <Button
-                                loadingText="Submitting"
-                                size="lg"
-                                bg={'blue.400'}
-                                color={'white'}
-                                _hover={{
-                                    bg: 'blue.500',
-                                }}>
-                                Sign up
-                            </Button>
-                        </Stack>
-                        <Stack pt={6}>
-                            <Text align={'center'}>
-                                Already a user? <Link color={'blue.400'} onClick={handleLoginRedirect}>Login</Link>
-                            </Text>
-                        </Stack>
+                        <SignupForm/>           
                     </Stack>
                 </Box>
             </Stack>

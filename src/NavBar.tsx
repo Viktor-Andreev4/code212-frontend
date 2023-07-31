@@ -3,7 +3,6 @@ import {
   Box,
   Flex,
   Avatar,
-  Center,
   HStack,
   Link,
   IconButton,
@@ -44,7 +43,7 @@ export default function withAction() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const examDisclosure = useDisclosure();
   const problemDisclosure = useDisclosure();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
   return (
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -82,15 +81,6 @@ export default function withAction() {
               onClose={problemDisclosure.onClose}
               isOpen={problemDisclosure.isOpen}
             />
-            {/* <Button
-              variant={'solid'}
-              colorScheme={'teal'}
-              size={'sm'}
-              mr={4}
-              leftIcon={<AddIcon />}
-              onClick={onOpen}>
-              Upload Exam
-            </Button> */}
 
             <Menu>
               <MenuButton

@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from "@chakra-ui/react";
 import {
   Heading,
   Box,
@@ -6,34 +9,98 @@ import {
   Stack,
   Button,
   useColorModeValue,
+  Spinner,
 } from '@chakra-ui/react';
-import { Spinner } from '@chakra-ui/react'
 import WithAction from '../../NavBar.tsx';
-import { useEffect, useState } from 'react';
-import { getExam } from '../../services/client.ts';
+import jwt_decode from 'jwt-decode';
+import { getExam, enrollUser, getUserId } from '../../services/client.ts';
+
+interface Problem {
+  id: number;
+  title: string;
+  description: string;
+  input_url: string;
+  output_url: string;
+}
 
 interface Exam {
+  problems: Problem[]
   name: string;
   startTime: string;
   endTime: string;
+  id: number;
 }
 
-export default function ExamProfile() {
+interface DecodedToken {
+  exp: number;
+  sub: string;
+  scopes: string[];
+}
+
+function ExamProfile() {
+  const navigate = useNavigate();
+  const toast = useToast();
   const [exam, setExam] = useState<Exam | null>(null);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     getExam().then(res => {
       setExam(res.data);
       console.log(res.data);
     }).catch(err => {
       console.log(err);
-    }).finally(() => {  
+    }).finally(() => {
       setLoading(false);
     })
   }, []);
 
+  
+
+  const handleStart = async () => {
+    if (exam) {
+      try {
+
+        const token = localStorage.getItem('jwtToken');
+        
+        if (token === null) {
+          throw new Error('No JWT token found');
+        }
+        
+        const decodedToken: DecodedToken = jwt_decode(token);
+        const email: string = decodedToken.sub; 
+        
+        const response = await getUserId(email);
+        console.log(exam);
+
+        const userId: number = response.data; 
+        
+        console.log(userId, exam.id);
+        await enrollUser(userId, exam.id);
+        
+        toast({
+          title: "Enrollment Successful",
+          description: "You have enrolled in the exam!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        
+        navigate('/problems', { state: { problems: exam.problems } });
+      } catch (error) {
+        toast({
+          title: "Enrollment Failed",
+          description: "An error occurred while enrolling in the exam",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        console.error(error);
+      }
+    }
+  }
+
   if (loading) {
-    if(!exam) {
+    if (!exam) {
       return (
         <Center py={6}>
           <Text>No upcomming exams</Text>
@@ -50,11 +117,11 @@ export default function ExamProfile() {
             emptyColor='gray.200'
             color='blue.500'
             size='xl'
-          />  
+          />
         </div>
       );
     }
-  
+
   }
 
   return (
@@ -80,6 +147,7 @@ export default function ExamProfile() {
 
         <Stack mt={8} direction={'row'} spacing={4}>
           <Button
+            onClick={handleStart}
             flex={1}
             fontSize={'sm'}
             rounded={'full'}
@@ -101,3 +169,5 @@ export default function ExamProfile() {
     </Center>
   );
 }
+
+export default ExamProfile;
