@@ -54,33 +54,47 @@ function ProblemDrawer({ isOpen, onClose, onOpen }: ProblemDrawerProps) {
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
+      try {
 
-      console.log(values);
-      const inputFile = values.inputFiles;
-      const outputFile = values.outputFiles;
-
-      // get Url
-      const s3UrlInput = await getS3UrlInput(values.problemName);
-      const s3UrlOutput = await getS3UrlOutput(values.problemName);
-      console.log(s3UrlInput);
-      // post to s3
-      await uploadFileS3(inputFile!, s3UrlInput);
-      await uploadFileS3(outputFile!, s3UrlOutput); 
-
-      // post to backend
-      await createProblem(values.problemName, values.description, s3UrlInput, s3UrlOutput);
-
-      toast({
-        title: "Problem created.",
-        description: "Your problem has been successfully created.",
-        status: "success",
-        duration: 9000,
-        isClosable: true,
-      });
-      onClose();
+        const inputFiles: File[] = values.inputFiles || [new File([], "input404.txt")];
+        const outputFiles: File[] = values.outputFiles || [new File([], "output404.txt")];
+        const filesCount: number = inputFiles.length;
+        
+        for (let i = 0; i < filesCount; i++) {
+          console.log(inputFiles[i]);
+          console.log(inputFiles[i].name);
       
+          const s3UrlInput: string = await getS3UrlInput(values.problemName, `input${i}.txt`);
+          const s3UrlOutput: string = await getS3UrlOutput(values.problemName, `output${i}.txt`);
+      
+          await uploadFileS3(inputFiles[i], s3UrlInput);
+          await uploadFileS3(outputFiles[i], s3UrlOutput);
+      
+          await createProblem(values.problemName, values.description, s3UrlInput, s3UrlOutput);
+        }
+
+        toast({
+          title: "Problem created.",
+          description: "Your problem has been successfully created.",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        onClose();
+
+      } catch (error) {
+        console.error("Error while creating problem", error);
+        toast({
+          title: "Error.",
+          description: "An error occurred while creating the problem.",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+
+      }
+      setSubmitting(false);
     }
-    
   });
 
   return (

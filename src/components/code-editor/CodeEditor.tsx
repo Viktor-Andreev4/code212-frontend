@@ -14,6 +14,8 @@ import Editor from "@monaco-editor/react";
 import * as monaco from 'monaco-editor';
 import { useLocation } from 'react-router-dom';
 import SplitPane from './SplitPane';
+import jwt_decode from 'jwt-decode';
+import { sendSubmission } from '../../services/client';
 
 interface Files {
     [fileName: string]: {
@@ -28,6 +30,13 @@ interface Problem {
     description: string;
     input_url: string;
     output_url: string;
+}
+
+interface DecodedToken {
+    userId: number;
+    exp: number;
+    sub: string;
+    scopes: string[];
 }
 
 const files: Files = {
@@ -59,12 +68,36 @@ function CodeEditor() {
     function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor, _monaco: typeof monaco) {
         editorRef.current = editor as monaco.editor.IStandaloneCodeEditor;
     }
-    function getEditorValue() {
+    async function getEditorValue() {
         if (editorRef.current) {
             const model = editorRef.current.getModel();
             if (model) {
-                const value: string = model.getValue();
-                alert(value);
+                const code: string = model.getValue();
+                const token = localStorage.getItem('jwtToken');
+                if (!token) {
+                    console.error('JWT not found');
+                    return;
+                }
+                const decodedToken: DecodedToken = jwt_decode(token);
+                const codeFile = new File([code], 'code.txt', { type: 'text/plain' });
+                const data = {
+                    problemId: problem.id,
+                    userId: decodedToken.userId,
+                    codeFile,
+                    language
+                }
+
+                await sendSubmission(
+                    data.problemId,
+                    data.userId,
+                    data.codeFile,
+                    data.language)
+                    .then((res) => {
+                        console.log(res);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
             }
         }
     }
@@ -99,7 +132,7 @@ function CodeEditor() {
                         defaultValue={file.value}
                     />
                     <Button position="fixed" right="0%" onClick={getEditorValue}>
-                        Get Editor Value
+                        Submit
                     </Button>
                 </Box>
             }

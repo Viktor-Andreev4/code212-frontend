@@ -98,7 +98,14 @@ function ExamProfile() {
       }
     }
   }
+  const isExamOngoing = () => {
+    const currentTime = new Date();
+    const startTime = new Date(exam?.startTime || '');
+    const endTime = new Date(exam?.endTime || '');
 
+    return currentTime >= startTime && currentTime <= endTime;
+  };
+  
   if (loading) {
     if (!exam) {
       return (
@@ -145,23 +152,26 @@ function ExamProfile() {
           Ends: {exam && exam.endTime ? new Date(exam.endTime).toLocaleString() : 'Loading...'}
         </Text>
 
+
         <Stack mt={8} direction={'row'} spacing={4}>
           <Button
             onClick={handleStart}
             flex={1}
             fontSize={'sm'}
             rounded={'full'}
-            bg={'blue.400'}
+            bg={isExamOngoing() ? 'blue.400' : 'gray.400'}
             color={'white'}
             boxShadow={
               '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
             }
             _hover={{
-              bg: 'blue.500',
+              bg: isExamOngoing() ? 'blue.500' : 'gray.500',
             }}
             _focus={{
-              bg: 'blue.500',
-            }}>
+              bg: isExamOngoing() ? 'blue.500' : 'gray.500',
+            }}
+            isDisabled={!isExamOngoing()}
+          >
             Start
           </Button>
         </Stack>

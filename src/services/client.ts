@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { tr } from 'date-fns/locale';
-
 
 const getAuthConfig = () => ({
     headers: {
@@ -114,14 +112,15 @@ export const getExamParticipants = async (examId: number) => {
     }
 }
 
-export const getS3UrlInput = async (problemName: string): Promise<string> => {
+export const getS3UrlInput = async (problemName: string, fileName: string): Promise<string> => {
     try {
         const response = await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/problems/upload/input`,
             {
                 ...getAuthConfig(),
                 params: {
-                    problemName: problemName
+                    problemName: problemName,
+                    fileName: fileName
                 }
             }
         );
@@ -131,14 +130,15 @@ export const getS3UrlInput = async (problemName: string): Promise<string> => {
     }
 }
 
-export const getS3UrlOutput = async (problemName: string): Promise<string> => {
+export const getS3UrlOutput = async (problemName: string, fileName: string): Promise<string> => {
     try {
         const response = await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/problems/upload/output`,
             {
                 ...getAuthConfig(),
                 params: {
-                    problemName: problemName
+                    problemName: problemName,
+                    fileName: fileName
                 }
             }
         );
@@ -150,8 +150,16 @@ export const getS3UrlOutput = async (problemName: string): Promise<string> => {
 
 export const uploadFileS3 = async (file: File, url: string) => {
     try {
-  
-        return await axios.put(url, file);
+        console.log(file.type);
+        const config = {
+            headers: {
+                "Content-Type": "text/plain" //"multipart/form-data" // || ,//file.type || 
+            },
+        };
+        const response = await axios.put(url, file, config);
+        console.log(response);
+
+        return response;
     }
     catch (error) {
         throw error;
@@ -164,6 +172,18 @@ export const createProblem = async (title: string, description: string, inputUrl
         return await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/problems`,
             { title, description, inputUrl, outputUrl },
+            getAuthConfig()
+        );
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const sendSubmission = async (problemId: number, userId: number, code: File, language: string) => {
+    try {
+        return await axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/code`,
+            { problemId, userId, code, language },
             getAuthConfig()
         );
     } catch (error) {
