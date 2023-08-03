@@ -13,7 +13,7 @@ import ProblemPage from './components/problem/ProblemPage.tsx'
 import Participants from './components/participants/Participants.tsx'
 
 const router = createBrowserRouter([
-  {
+  { 
     path: "/login",
     element: <Login />//<AuthProvider><Login /></AuthProvider>
   },

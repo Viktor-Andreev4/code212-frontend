@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import axios from 'axios';
 
-function MultipleFileUploadField() {
+interface MultipleFileUploadFieldProps {
+  id: string;
+  name: string;
+  setFieldValue: (field: string, value: any) => void;
+}
+
+function MultipleFileUploadField({ name, setFieldValue }: MultipleFileUploadFieldProps) {
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -10,28 +15,12 @@ function MultipleFileUploadField() {
     },
     minSize: 2,
     onDrop: acceptedFiles => {
-
-      const data = new FormData();
-      acceptedFiles.forEach(file => data.append('file', file));
-
-      axios.post('/your-endpoint', data, {
-        onUploadProgress: progressEvent => {
-          if (progressEvent.total) {
-            const percentage = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadPercentage(percentage);
-            if (progressEvent.loaded === progressEvent.total) {
-              setTimeout(() => setUploadPercentage(0), 1000);
-            }
-          }
-        }
-      })
-        .then(response => console.log(response))
-        .catch(error => console.log(error));
+      setFieldValue(name, acceptedFiles);
+      setUploadPercentage(100);
     }
   });
 
   const files = acceptedFiles.map(file => <li key={file.name} style={{listStyleType: 'none'}}>{file.name}</li>);
-  
 
   return (
     <div style={{ width: '500px', margin: '0 auto', textAlign: 'center' }}>

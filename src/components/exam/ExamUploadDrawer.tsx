@@ -238,12 +238,12 @@ function ExamDrawer({ isOpen, onClose, onOpen }: ExamDrawerProps) {
                   {selectedProblems.map(problem => (
                     <Box key={problem.id} mt={1} display="flex" alignItems="center">
                       <Box mr={2}>{problem.title}</Box>
-                      <button onClick={() => handleRemoveProblem(problem.id)}>Remove</button>
+                      <Button size="sm" colorScheme="red" onClick={() => handleRemoveProblem(problem.id)}>Remove</Button>
                     </Box>
                   ))}
                 </Box>
                 <DrawerFooter borderTopWidth='1px'  >
-                  <Button variant='outline' mr={3} mt={50}onClick={onClose} >
+                  <Button variant='outline' mr={3} mt={50} onClick={onClose} >
                     Cancel
                   </Button>
                   <Button colorScheme='blue' type="submit" mt={50}>Submit</Button>

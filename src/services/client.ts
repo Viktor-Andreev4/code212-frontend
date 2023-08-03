@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { tr } from 'date-fns/locale';
 
 
 const getAuthConfig = () => ({
@@ -26,11 +27,11 @@ export const getExam = async () => {
     }
 }
 export const register = async (
-    firstName:string, lastName: string, email:string, password:string) => {
+    firstName: string, lastName: string, email: string, password: string) => {
 
     return await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/v1/users`,
-        {firstName, lastName, email, password});
+        { firstName, lastName, email, password });
 }
 
 export const login = async (username: string, password: string) => {
@@ -106,6 +107,63 @@ export const getExamParticipants = async (examId: number) => {
     try {
         return await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/exams/${examId}/participants`,
+            getAuthConfig()
+        );
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getS3UrlInput = async (problemName: string): Promise<string> => {
+    try {
+        const response = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/problems/upload/input`,
+            {
+                ...getAuthConfig(),
+                params: {
+                    problemName: problemName
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getS3UrlOutput = async (problemName: string): Promise<string> => {
+    try {
+        const response = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/problems/upload/output`,
+            {
+                ...getAuthConfig(),
+                params: {
+                    problemName: problemName
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const uploadFileS3 = async (file: File, url: string) => {
+    try {
+  
+        return await axios.put(url, file);
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+export const createProblem = async (title: string, description: string, inputUrl: string, outputUrl: string) => {
+    try {
+        return await axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/problems`,
+            { title, description, inputUrl, outputUrl },
             getAuthConfig()
         );
     } catch (error) {
