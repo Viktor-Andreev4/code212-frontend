@@ -153,7 +153,7 @@ export const uploadFileS3 = async (file: File, url: string) => {
         console.log(file.type);
         const config = {
             headers: {
-                "Content-Type": "text/plain" //"multipart/form-data" // || ,//file.type || 
+                "Content-Type": "text/plain"
             },
         };
         const response = await axios.put(url, file, config);
@@ -179,10 +179,10 @@ export const createProblem = async (title: string, description: string, inputUrl
     }
 }
 
-export const sendSubmission = async (problemId: number, userId: number, code: File, language: string) => {
+export const sendSubmission = async (code: string,userId: number, problemId: number, language: string) => {
     try {
         return await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/code`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/code/execute`,
             { problemId, userId, code, language },
             getAuthConfig()
         );

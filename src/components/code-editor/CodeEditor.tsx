@@ -50,11 +50,21 @@ const files: Files = {
         language: "javascript",
         value: `console.log("Hello, World")
           `
+    },
+    "Main.java": {
+        name: "Main.java",
+        language: "java",
+        value: `class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+    `
     }
 }
 function CodeEditor() {
-    const [language, setLanguage] = useState("JavaScript");
-    const [fileName, setFileName] = useState("script.js");
+    const [language, setLanguage] = useState("Java");
+    const [fileName, setFileName] = useState("Main.java");
     const location = useLocation();
     const problem: Problem = location.state.problem;
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -79,18 +89,17 @@ function CodeEditor() {
                     return;
                 }
                 const decodedToken: DecodedToken = jwt_decode(token);
-                const codeFile = new File([code], 'code.txt', { type: 'text/plain' });
                 const data = {
                     problemId: problem.id,
                     userId: decodedToken.userId,
-                    codeFile,
+                    code,
                     language
                 }
 
                 await sendSubmission(
-                    data.problemId,
+                    data.code,
                     data.userId,
-                    data.codeFile,
+                    data.problemId,
                     data.language)
                     .then((res) => {
                         console.log(res);
