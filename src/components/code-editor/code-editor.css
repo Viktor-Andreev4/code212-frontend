@@ -1,0 +1,33 @@
+.SplitPane {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+}
+
+.Pane {
+    overflow: auto;
+    height: 100%;
+}
+
+.Divider {
+    width: 10px;
+    background: gray;
+    cursor: ew-resize;
+}
+
+@keyframes breathing {
+    0% {
+        box-shadow: 0 0 5px rgba(255, 165, 0, 0.9);
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(255, 165, 0, 0.6),
+            0 0 25px rgba(255, 165, 0, 0.7),
+            0 0 35px rgba(255, 165, 0, 0.8);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(255, 165, 0, 0.9);
+    }
+}

@@ -1,5 +1,5 @@
 import { useState, ReactNode } from 'react';
-import './SplitPane.css'; 
+import './code-editor.css'; 
 
 interface SplitPaneProps {
   left: ReactNode;

@@ -4,7 +4,7 @@ import App from './App.tsx'
 import Login from './components/login/Login.tsx'
 import Register from './components/login/Register.tsx'
 import CodeEditor from './components/code-editor/CodeEditor.tsx'  
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 import AuthProvider from './components/context/AuthContext.tsx'
@@ -23,7 +23,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/code-editor",
-    element: <CodeEditor />//<AuthProvider><Register /></AuthProvider>
+    element: <CodeEditor />
   },
   {
     path: "/dashboard",
@@ -41,6 +41,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ChakraProvider>
+      <ColorModeScript initialColorMode="dark" />
       <AuthProvider>
         <RouterProvider router={router} />
       </AuthProvider>

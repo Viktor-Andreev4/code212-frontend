@@ -1,4 +1,7 @@
 import {
+    Alert,
+    AlertIcon,
+    Spinner,
     Box,
     Button,
     Heading,
@@ -6,7 +9,8 @@ import {
     Menu,
     MenuButton,
     MenuList,
-    MenuItem
+    MenuItem,
+    Flex
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { useState, useRef } from 'react';
@@ -17,6 +21,10 @@ import SplitPane from './SplitPane';
 import jwt_decode from 'jwt-decode';
 import { sendSubmission } from '../../services/client';
 
+interface Status {
+    id: number;
+    description: string;
+}
 interface Files {
     [fileName: string]: {
         name: string;
@@ -40,19 +48,19 @@ interface DecodedToken {
 }
 
 const files: Files = {
-    "script.py": {
-        name: "script.py",
+    "Python": {
+        name: "Python",
         language: "python",
         value: "print('Hello, World')"
     },
-    "script.js": {
-        name: "script.js",
+    "JavaScript": {
+        name: "JavaScript",
         language: "javascript",
         value: `console.log("Hello, World")
           `
     },
-    "Main.java": {
-        name: "Main.java",
+    "Java": {
+        name: "Java",
         language: "java",
         value: `class HelloWorld {
     public static void main(String[] args) {
@@ -60,11 +68,31 @@ const files: Files = {
     }
 }
     `
+    },
+    "C++": {
+        name: "C++",
+        language: "cpp",
+        value: `#include <iostream>
+
+int main() {
+
+    int number;
+    std::cin >> number;
+    std::cout << number << std::endl;
+        
+return 0;
+}
+    `
     }
+
+
 }
 function CodeEditor() {
-    const [language, setLanguage] = useState("Java");
-    const [fileName, setFileName] = useState("Main.java");
+    const [loading, setLoading] = useState(false);
+    const [submissionResult, setSubmissionResult] = useState<string | null>(null);
+
+    const [language, setLanguage] = useState("c++");
+    const [fileName, setFileName] = useState("C++");
     const location = useLocation();
     const problem: Problem = location.state.problem;
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -95,7 +123,8 @@ function CodeEditor() {
                     code,
                     language
                 }
-
+                setLoading(true);
+                setSubmissionResult(null);
                 await sendSubmission(
                     data.code,
                     data.userId,
@@ -103,49 +132,115 @@ function CodeEditor() {
                     data.language)
                     .then((res) => {
                         console.log(res);
+                        setLoading(false);
+                        const status: Status = res.data[0].status;
+                        console.log(status);
+                        setSubmissionResult(status.description);
                     })
                     .catch((error) => {
                         console.error(error);
+                        setLoading(false);
+                        setSubmissionResult('Error');
                     });
             }
         }
     }
 
+
     return (
-        <SplitPane
-            left={
-                <Box p={5} shadow="md" borderWidth="1px">
-                    <Heading fontSize="xl">{problem.title}</Heading>
-                    <Text mt={4}>{problem.description}</Text>
-                </Box>
-            }
-            right={
-                <Box position="relative" width="100%" height="100vh">
-                    <Menu>
-                        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                            Switch Language
-                        </MenuButton>
-                        <MenuList>
-                            <MenuItem onClick={() => switchLanguage("Java", "Main.java")}>Java</MenuItem>
-                            <MenuItem onClick={() => switchLanguage("JavaScript", "script.js")}>JavaScript</MenuItem>
-                            <MenuItem onClick={() => switchLanguage("Python", "script.py")}>Python</MenuItem>
-                        </MenuList>
-                    </Menu>
-                    <Editor
-                        height="90%"
-                        width="100%"
-                        theme="vs-dark"
-                        onMount={handleEditorDidMount}
-                        path={file.name}
-                        defaultLanguage={file.language}
-                        defaultValue={file.value}
-                    />
-                    <Button position="fixed" right="0%" onClick={getEditorValue}>
-                        Submit
-                    </Button>
-                </Box>
-            }
-        />
+        <Box style={{ backgroundColor: '#282828', width: '100%', height: '100vh' }}>
+            <SplitPane
+                left={
+                    <Box
+                        p={5}
+                        shadow="md"
+                        borderWidth="2px" // Increased border width
+                        borderColor="gray.600" // Border color
+                        borderRadius="md" // Rounded borders
+                        color="white"
+                        backgroundColor="#282828"
+                    >
+                        <Heading fontSize="xl">{problem.title}</Heading>
+                        <Text mt={4} color="gray.300">{problem.description}</Text>
+                    </Box>
+                }
+                right={
+                    <Box position="relative" width="100%" height="100vh" backgroundColor="#282828">
+                        <Box m={1}>
+                        <Menu >
+                            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} backgroundColor="#282828" color="white">
+                                {fileName}
+                            </MenuButton>
+                            <MenuList backgroundColor="#282828">
+                                {Object.keys(files).map((fileName) => (
+                                    <MenuItem key={fileName} onClick={() => switchLanguage(files[fileName].language, fileName)}>
+                                        {fileName}
+                                    </MenuItem>
+                                ))}
+                            </MenuList>
+                        </Menu>
+                        </Box>
+                        <Box
+                            borderWidth="2px"
+                            borderColor="gray.600"
+                            borderRadius="md"
+                            mt={2}
+                            mb={4} 
+                            overflow="hidden" 
+                            height="78%" 
+                        >
+                            <Editor
+                                height="100%" 
+                                width="100%"
+                                theme="vs-dark"
+                                onMount={handleEditorDidMount}
+                                path={file.name}
+                                defaultLanguage={file.language}
+                                defaultValue={file.value}
+                            />
+                        </Box>
+                        <Box
+                            width="100%"
+                            height="13%"
+                            borderTop="1px solid"
+                            borderColor="gray.300"
+                            position="relative"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            px={4}
+                            py={2}
+                            borderRadius="md"
+                            backgroundColor="#282828"
+                            css={loading ? {
+                                animation: "breathing 1.5s infinite",
+                                boxShadow: "0 0 10px rgba(255, 165, 0, 0.9)"
+                            } : {}}
+                        >
+                            <Flex>
+                                {loading && <Spinner color="yellow.400" mr={4} />}
+                                {submissionResult && (
+                                    <Alert status={submissionResult === "Accepted" ? "success" : "error"}>
+                                        <AlertIcon />
+                                        {submissionResult}
+                                    </Alert>
+                                )}
+                            </Flex>
+                            <Button
+                                onClick={getEditorValue}
+                                colorScheme="green"
+                                size="lg"
+                                shadow="md"
+                                _hover={{ opacity: 0.8 }}
+                                _active={{ opacity: 0.6 }}
+                            >
+                                Submit
+                            </Button>
+                        </Box>
+                    </Box>
+                }
+            />
+        </Box>
     );
 
 }

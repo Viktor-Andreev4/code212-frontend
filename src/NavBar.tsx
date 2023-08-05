@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import {
   Box,
   Flex,
@@ -12,9 +11,10 @@ import {
   MenuItem,
   MenuDivider,
   useDisclosure,
-  useColorModeValue,
   Stack,
   Image,
+  useColorModeValue,
+  useColorMode
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import ExamCard from './components/exam/ExamCard';
@@ -22,14 +22,19 @@ import ExamDrawer from './components/exam/ExamUploadDrawer';
 import ProblemDrawer from './components/problem/ProblemUploadDrawer';
 import { useAuth } from '../src/components/context/AuthContext';
 import { Link as ChakraLink } from "@chakra-ui/react";
+import { Link as RouterLink } from 'react-router-dom';
+import { LinkProps as RouterLinkProps } from 'react-router-dom';
+import { ReactNode } from 'react';
 import { LinkProps as ChakraLinkProps } from '@chakra-ui/react';
-import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 
 type ChakraRouterLinkProps = ChakraLinkProps & RouterLinkProps;
 
-const ChakraRouterLink: React.FC<ChakraRouterLinkProps> = (props) => {
-  return <ChakraLink as={RouterLink} {...props} />;
-};
+
+const ChakraRouterLink: React.FC<ChakraRouterLinkProps> = ({ to, children, ...props }) => (
+  <ChakraLink as={RouterLink} to={to} {...props}>
+    {children}
+  </ChakraLink>
+);
 
 const Links = [
   { name: 'Exams', path: '/exams' },
@@ -41,7 +46,17 @@ type NavLinkProps = {
   children: ReactNode;
 }
 
-const NavLink: React.FC<NavLinkProps> = ({ to, children }) => (
+function ToggleColorModeButton() {
+  const { colorMode, toggleColorMode } = useColorMode();
+
+  return (
+    <Button onClick={toggleColorMode}>
+      Toggle {colorMode === "light" ? "Dark" : "Light"}
+    </Button>
+  );
+}
+
+const NavLink = ({ to, children }: NavLinkProps) => (
   <ChakraRouterLink
     to={to}
     px={2}
@@ -56,14 +71,17 @@ const NavLink: React.FC<NavLinkProps> = ({ to, children }) => (
   </ChakraRouterLink>
 );
 
-export default function withAction() {
+function WithAction() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const examDisclosure = useDisclosure();
   const problemDisclosure = useDisclosure();
   const { logout } = useAuth();
+  const bgColor = useColorModeValue("#F7FAFC", "#2D3748");
+  const hoverColor = useColorModeValue('gray.200', 'gray.700');
+
   return (
     <>
-      <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
+      <Box bg={bgColor} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <IconButton
             size={'md'}
@@ -115,7 +133,7 @@ export default function withAction() {
                   }
                 />
               </MenuButton>
-              <MenuList>
+              <MenuList bg={bgColor}>
                 <MenuDivider />
                 <MenuItem onClick={logout}>
                   Logout
@@ -126,7 +144,7 @@ export default function withAction() {
         </Flex>
 
         {isOpen ? (
-          <Box pb={4} display={{ md: 'none' }}>
+          <Box pb={4} display={{ md: 'none' }} bg={bgColor}>
             <Stack as={'nav'} spacing={4}>
               {Links.map((link) => (
                 <NavLink key={link.name} to={link.path}>
@@ -143,3 +161,4 @@ export default function withAction() {
     </>
   );
 }
+export default WithAction;
