@@ -178,11 +178,11 @@ export const createProblem = async (title: string, description: string, inputUrl
     }
 }
 
-export const sendSubmission = async (code: string,userId: number, problemId: number, language: string) => {
+export const sendSubmission = async (code: string, examId: number, userId: number, problemId: number, language: string) => {
     try {
         return await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/code/execute`,
-            { problemId, userId, code, language },
+            { problemId, examId, userId, code, language },
             getAuthConfig()
         );
     } catch (error) {

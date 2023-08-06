@@ -29,7 +29,7 @@ function ProblemsPage() {
   };
 
   return (
-    <Container maxW="container.lg" p="5" bg="#282828" color="white" height="100vh">
+    <Container maxW="container.lg" p="5"  color="white" height="100vh" fontFamily={'"Space Mono", sans-serif'}>
       <VStack spacing={8} align="stretch">
         {problems.map((problem: Problem, index: number) => (
           <Box
@@ -43,7 +43,7 @@ function ProblemsPage() {
             _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
             transition="transform 0.2s ease, box-shadow 0.2s ease"
           >
-            <Heading size="lg" mb={2} color="white">
+            <Heading size="lg" mb={2} color="white" fontFamily={'"Space Mono", sans-serif'}>
               {problem.title}
             </Heading>
             <Divider my={3} borderColor="gray.600" />

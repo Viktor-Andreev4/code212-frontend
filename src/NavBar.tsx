@@ -26,6 +26,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { LinkProps as RouterLinkProps } from 'react-router-dom';
 import { ReactNode } from 'react';
 import { LinkProps as ChakraLinkProps } from '@chakra-ui/react';
+import Logo from './components/Logo/Logo';
 
 type ChakraRouterLinkProps = ChakraLinkProps & RouterLinkProps;
 
@@ -80,8 +81,8 @@ function WithAction() {
   const hoverColor = useColorModeValue('gray.200', 'gray.700');
 
   return (
-    <>
-      <Box bg={bgColor} px={4}>
+      <>
+      <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <IconButton
             size={'md'}
@@ -91,11 +92,7 @@ function WithAction() {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
-            <Image
-              borderRadius='full'
-              boxSize='35px'
-              src="https://play-lh.googleusercontent.com/fHfTlNIq5PMps_296XPMC2N-u5ARCmaSM_lNuukKjhK8ITbHHS5YyYyT5ABJU1s8_Q=w240-h480"
-            />
+            <Logo/>
             <HStack
               as={'nav'}
               spacing={4}

@@ -13,13 +13,13 @@ import {
     Flex
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Editor from "@monaco-editor/react";
 import * as monaco from 'monaco-editor';
 import { useLocation } from 'react-router-dom';
 import SplitPane from './SplitPane';
 import jwt_decode from 'jwt-decode';
-import { getS3SubmissionLink, sendSubmission, uploadFileS3 } from '../../services/client';
+import { getExam, getS3SubmissionLink, sendSubmission, uploadFileS3 } from '../../services/client';
 
 interface Status {
     id: number;
@@ -47,9 +47,16 @@ interface Problem {
     id: number;
     title: string;
     description: string;
-    input_url: string;
-    output_url: string;
 }
+
+interface Exam {
+    problems: Problem[]
+    name: string;
+    startTime: string;
+    endTime: string;
+    id: number;
+}
+
 
 interface DecodedToken {
     userId: number;
@@ -102,14 +109,24 @@ function CodeEditor() {
     const [loading, setLoading] = useState(false);
     const [submissionResult, setSubmissionResult] = useState<string | null>(null);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [exam, setExam] = useState<Exam | null>(null);
 
     const [language, setLanguage] = useState("c++");
     const [fileName, setFileName] = useState("C++");
     const location = useLocation();
     const problem: Problem = location.state.problem;
+
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
     const file = files[fileName];
 
+    useEffect(() => {
+        getExam().then(res => {
+          setExam(res.data);
+          console.log(res.data);
+        }).catch(err => {
+          console.log(err);
+        })
+      }, []);
 
     const switchLanguage = (lang: string, fileName: string) => {
         setLanguage(lang);
@@ -137,7 +154,8 @@ function CodeEditor() {
                 }
                 setLoading(true);
                 setSubmissionResult(null);
-                await sendSubmission(data.code, data.userId, data.problemId, data.language)
+
+                await sendSubmission(data.code, exam!.id, data.userId, data.problemId, data.language)
                     .then(async (res) => {
 
                         setLoading(false);
@@ -169,6 +187,8 @@ function CodeEditor() {
                         const codeFile = new File([blob], crypto.randomUUID(), { type: 'text/plain' });
                         await uploadFileS3(codeFile, s3SignedUrl);
 
+                        // send to grade
+
                     })
                     .catch((error) => {
                         console.error(error);
@@ -182,7 +202,7 @@ function CodeEditor() {
 
 
     return (
-        <Box style={{ backgroundColor: '#282828', width: '100%', height: '100vh' }}>
+        <Box style={{ backgroundColor: '#282828', width: '100%', height: '100vh' }} fontFamily={'"Space Mono", sans-serif'}>
             <SplitPane
                 left={
                     <Box
@@ -194,7 +214,7 @@ function CodeEditor() {
                         color="white"
                         backgroundColor="#282828"
                     >
-                        <Heading fontSize="xl">{problem.title}</Heading>
+                        <Heading fontSize="xl" fontFamily={'"Space Mono", sans-serif'}>{problem.title}</Heading>
                         <Text mt={4} color="gray.300">{problem.description}</Text>
                     </Box>
                 }
@@ -279,6 +299,7 @@ function CodeEditor() {
                                 shadow="md"
                                 _hover={{ opacity: 0.8 }}
                                 _active={{ opacity: 0.6 }}
+
                             >
                                 Submit
                             </Button>
