@@ -150,14 +150,13 @@ export const getS3UrlOutput = async (problemName: string, fileName: string): Pro
 
 export const uploadFileS3 = async (file: File, url: string) => {
     try {
-        console.log(file.type);
+
         const config = {
             headers: {
                 "Content-Type": "text/plain"
             },
         };
         const response = await axios.put(url, file, config);
-        console.log(response);
 
         return response;
     }
@@ -190,3 +189,23 @@ export const sendSubmission = async (code: string,userId: number, problemId: num
         throw error;
     }
 }
+
+export const getS3SubmissionLink = async (userId: number, problemName: string, uuid: string): Promise<string> => {
+    try {
+        const response = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/code/upload`,
+            {
+                ...getAuthConfig(),
+                params: {
+                    userId: userId,
+                    problemName: problemName,
+                    uuid: uuid
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+

@@ -54,7 +54,6 @@ function ProblemsPage() {
               </ListItem>
             </UnorderedList>
             <Button onClick={() => handleStartProblem(problem)} colorScheme="blue" mt={4}>Start</Button>
-            {/* Start button */}
           </Box>
         ))}
       </VStack>

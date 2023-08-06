@@ -19,12 +19,22 @@ import * as monaco from 'monaco-editor';
 import { useLocation } from 'react-router-dom';
 import SplitPane from './SplitPane';
 import jwt_decode from 'jwt-decode';
-import { sendSubmission } from '../../services/client';
+import { getS3SubmissionLink, sendSubmission, uploadFileS3 } from '../../services/client';
 
 interface Status {
     id: number;
     description: string;
 }
+
+interface Submission {
+    memory: number;
+    status: Status;
+    stderr: string;
+    stdin: string;
+    stdout: string;
+    time: number;
+}
+
 interface Files {
     [fileName: string]: {
         name: string;
@@ -32,6 +42,7 @@ interface Files {
         value: string;
     }
 }
+
 interface Problem {
     id: number;
     title: string;
@@ -90,6 +101,7 @@ return 0;
 function CodeEditor() {
     const [loading, setLoading] = useState(false);
     const [submissionResult, setSubmissionResult] = useState<string | null>(null);
+    const [submissions, setSubmissions] = useState<Submission[]>([]);
 
     const [language, setLanguage] = useState("c++");
     const [fileName, setFileName] = useState("C++");
@@ -125,23 +137,45 @@ function CodeEditor() {
                 }
                 setLoading(true);
                 setSubmissionResult(null);
-                await sendSubmission(
-                    data.code,
-                    data.userId,
-                    data.problemId,
-                    data.language)
-                    .then((res) => {
-                        console.log(res);
+                await sendSubmission(data.code, data.userId, data.problemId, data.language)
+                    .then(async (res) => {
+
                         setLoading(false);
-                        const status: Status = res.data[0].status;
-                        console.log(status);
-                        setSubmissionResult(status.description);
+                        const submissionsData: Submission[] = res.data;
+                        setSubmissions(submissionsData);
+                        console.log(submissionsData);
+
+                        const errorStatus = submissions.find(sub => sub.status.id > 4);
+
+                        if (errorStatus) {
+
+                            setSubmissionResult(errorStatus.status.description);
+                        } else {
+                            const statusCode4 = submissions.find(sub => sub.status.id === 4);
+
+                            if (statusCode4) {
+                                setSubmissionResult(`Input: ${statusCode4.stdin} | Output: ${statusCode4.stdout}`);
+                            } else {
+                                setSubmissionResult(`${submissionsData.length} / ${submissionsData.length}`);
+                            }
+                        }
+
+                        const userId = data.userId;
+                        const codeString = data.code;
+                        const uuid = crypto.randomUUID() + ".txt";
+                        const s3SignedUrl = await getS3SubmissionLink(userId, problem.title, uuid);
+
+                        const blob = new Blob([codeString], { type: 'text/plain' });
+                        const codeFile = new File([blob], crypto.randomUUID(), { type: 'text/plain' });
+                        await uploadFileS3(codeFile, s3SignedUrl);
+
                     })
                     .catch((error) => {
                         console.error(error);
                         setLoading(false);
                         setSubmissionResult('Error');
                     });
+
             }
         }
     }
@@ -154,9 +188,9 @@ function CodeEditor() {
                     <Box
                         p={5}
                         shadow="md"
-                        borderWidth="2px" // Increased border width
-                        borderColor="gray.600" // Border color
-                        borderRadius="md" // Rounded borders
+                        borderWidth="2px"
+                        borderColor="gray.600"
+                        borderRadius="md"
                         color="white"
                         backgroundColor="#282828"
                     >
@@ -167,30 +201,30 @@ function CodeEditor() {
                 right={
                     <Box position="relative" width="100%" height="100vh" backgroundColor="#282828">
                         <Box m={1}>
-                        <Menu >
-                            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} backgroundColor="#282828" color="white">
-                                {fileName}
-                            </MenuButton>
-                            <MenuList backgroundColor="#282828">
-                                {Object.keys(files).map((fileName) => (
-                                    <MenuItem key={fileName} onClick={() => switchLanguage(files[fileName].language, fileName)}>
-                                        {fileName}
-                                    </MenuItem>
-                                ))}
-                            </MenuList>
-                        </Menu>
+                            <Menu >
+                                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} backgroundColor="#282828" color="white">
+                                    {fileName}
+                                </MenuButton>
+                                <MenuList backgroundColor="#282828">
+                                    {Object.keys(files).map((fileName) => (
+                                        <MenuItem key={fileName} onClick={() => switchLanguage(files[fileName].language, fileName)}>
+                                            {fileName}
+                                        </MenuItem>
+                                    ))}
+                                </MenuList>
+                            </Menu>
                         </Box>
                         <Box
                             borderWidth="2px"
                             borderColor="gray.600"
                             borderRadius="md"
                             mt={2}
-                            mb={4} 
-                            overflow="hidden" 
-                            height="78%" 
+                            mb={4}
+                            overflow="hidden"
+                            height="78%"
                         >
                             <Editor
-                                height="100%" 
+                                height="100%"
                                 width="100%"
                                 theme="vs-dark"
                                 onMount={handleEditorDidMount}
@@ -200,7 +234,7 @@ function CodeEditor() {
                             />
                         </Box>
                         <Box
-                            width="100%"
+                            width="97%"
                             height="13%"
                             borderTop="1px solid"
                             borderColor="gray.300"
@@ -208,6 +242,8 @@ function CodeEditor() {
                             display="flex"
                             alignItems="center"
                             justifyContent="space-between"
+                            mr={1}
+                            ml={2}
                             px={4}
                             py={2}
                             borderRadius="md"
@@ -220,8 +256,18 @@ function CodeEditor() {
                             <Flex>
                                 {loading && <Spinner color="yellow.400" mr={4} />}
                                 {submissionResult && (
-                                    <Alert status={submissionResult === "Accepted" ? "success" : "error"}>
-                                        <AlertIcon />
+                                    <Alert
+                                        status={
+                                            submissionResult === "Accepted" || !submissionResult.includes("Output")
+                                                ? "success"
+                                                : "error"
+                                        }
+                                        borderRadius="8px"
+                                        boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+                                        p={4}
+                                        transition="opacity 0.3s ease"
+                                    >
+                                        <AlertIcon boxSize="24px" mr={1} />
                                         {submissionResult}
                                     </Alert>
                                 )}

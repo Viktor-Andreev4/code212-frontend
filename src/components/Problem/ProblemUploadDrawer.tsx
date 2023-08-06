@@ -1,6 +1,7 @@
 import { useFormik, FormikProvider, useField } from 'formik';
 import * as Yup from 'yup';
 import { useRef } from 'react';
+import { Textarea } from '@chakra-ui/react';
 import { Box, Button, Stack, FormLabel, DrawerFooter, Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, DrawerHeader, DrawerBody, Alert, AlertIcon, Input, useToast } from '@chakra-ui/react';
 import MultipleFileUploadField from './MultipleFileUploadField';
 import { createProblem, getS3UrlInput, getS3UrlOutput, uploadFileS3 } from '../../services/client.ts';
@@ -25,6 +26,28 @@ interface MyTextInputProps {
   type?: string;
   placeholder?: string;
 }
+interface MyTextareaInputProps {
+  id?: string;
+  label: string;
+  name: string;
+  placeholder?: string;
+}
+
+const MyTextareaInput = ({ label, ...props }: MyTextareaInputProps) => {
+  const [field, meta] = useField(props);
+  return (
+    <Box>
+      <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+      <Textarea className="text-input" {...field} {...props} />
+      {meta.touched && meta.error ? (
+        <Alert className="error" status={"error"} mt={2}>
+          <AlertIcon />
+          {meta.error}
+        </Alert>
+      ) : null}
+    </Box>
+  );
+};
 
 const MyTextInput = ({ label, ...props }: MyTextInputProps) => {
   const [field, meta] = useField(props);
@@ -113,7 +136,7 @@ function ProblemDrawer({ isOpen, onClose, onOpen }: ProblemDrawerProps) {
             <DrawerBody>
               <Stack spacing='24px'>
                 <MyTextInput id='problemName' name='problemName' label='Name' placeholder='Please enter problem name' />
-                <MyTextInput id='description' name='description' label='Problem description' placeholder='Enter some text' />
+                <MyTextareaInput id='description' name='description' label='Problem description' placeholder='Enter some text' />
                 <FormLabel htmlFor='inputFiles'>Drop input .txt files here</FormLabel>
                 <MultipleFileUploadField id='inputFiles' name='inputFiles' setFieldValue={formik.setFieldValue} />
                 <FormLabel htmlFor='outputFiles'>Drop output .txt files here</FormLabel>
