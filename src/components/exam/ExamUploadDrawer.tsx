@@ -143,7 +143,7 @@ function ExamDrawer({ isOpen, onClose, onOpen }: ExamDrawerProps) {
 
   return (
     <>
-      <Button colorScheme='teal' onClick={onOpen} mr={4}>
+      <Button colorScheme='blue' onClick={onOpen} mr={4}>
         Create Exam
       </Button>
       <Drawer

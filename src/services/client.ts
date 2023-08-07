@@ -209,3 +209,28 @@ export const getS3SubmissionLink = async (userId: number, problemName: string, u
     }
 }
 
+export const getParticipantGrades = async (examId: number, userId: number) => {
+    try {
+        return await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/grades/${examId}/students/${userId}`,
+            getAuthConfig()
+        );
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
+export const editReport = async (gradeId: number, report: string) => {
+    try {
+        
+        return await axios.patch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/grades`,
+            { gradeId, report },
+            getAuthConfig()
+        );
+    } catch (error) {
+        throw error;
+    }
+}

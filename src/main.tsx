@@ -11,6 +11,8 @@ import AuthProvider from './components/context/AuthContext.tsx'
 import ProtectedRoute from './shared/ProtectedRoute.tsx'
 import ProblemPage from './components/problem/ProblemPage.tsx'
 import Participants from './components/participants/Participants.tsx'
+import ExamPage from './components/exam/ExamPage.tsx'
+import theme from './theme.tsx'
 
 const router = createBrowserRouter([
   { 
@@ -36,11 +38,15 @@ const router = createBrowserRouter([
   {
     path: "/participants",
     element: <Participants/>
+  },
+  {
+    path: "/exams",
+    element: <ExamPage/>
   }
 ]) 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <ColorModeScript initialColorMode="dark" />
       <AuthProvider>
         <RouterProvider router={router} />

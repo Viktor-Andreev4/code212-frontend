@@ -122,7 +122,7 @@ function ProblemDrawer({ isOpen, onClose, onOpen }: ProblemDrawerProps) {
 
   return (
     <FormikProvider value={formik}>
-      <Button colorScheme='teal' onClick={onOpen} mr={4}>
+      <Button colorScheme='blue' onClick={onOpen} mr={4}>
         Create Problem
       </Button>
       <Drawer isOpen={isOpen} placement='right' initialFocusRef={firstField} onClose={onClose} size={'xl'}>
@@ -133,7 +133,7 @@ function ProblemDrawer({ isOpen, onClose, onOpen }: ProblemDrawerProps) {
             <DrawerHeader borderBottomWidth='1px'>
               Create a new problem
             </DrawerHeader>
-            <DrawerBody>
+            <DrawerBody overflowY="auto" maxHeight="700px">
               <Stack spacing='24px'>
                 <MyTextInput id='problemName' name='problemName' label='Name' placeholder='Please enter problem name' />
                 <MyTextareaInput id='description' name='description' label='Problem description' placeholder='Enter some text' />
